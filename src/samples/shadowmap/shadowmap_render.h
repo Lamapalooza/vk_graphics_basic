@@ -67,6 +67,7 @@ private:
   {
     float4x4 projView;
     float4x4 model;
+    bool rotated;
   } pushConst2M;
 
   float4x4 m_worldViewProj;
@@ -84,7 +85,7 @@ private:
   VulkanSwapChain m_swapchain;
 
   Camera   m_cam;
-  uint32_t m_width  = 1024u;
+  uint32_t m_width =  1024u;
   uint32_t m_height = 1024u;
   uint32_t m_framesInFlight = 2u;
   bool m_vsync = false;
