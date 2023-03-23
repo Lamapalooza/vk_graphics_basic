@@ -2,9 +2,10 @@
 
 int main()
 {
-  constexpr int LENGTH = 10;
+  constexpr int LENGTH           = 2000000;
   constexpr int VULKAN_DEVICE_ID = 0;
 
+  std::system("cd ../resources/shaders && python compile_simple_compute_shaders.py");
   std::shared_ptr<ICompute> app = std::make_unique<SimpleCompute>(LENGTH);
   if(app == nullptr)
   {
