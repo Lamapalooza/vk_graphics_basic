@@ -1,0 +1,77 @@
+#version 430
+#extension GL_GOOGLE_include_directive : require
+
+#include "common.h"
+
+layout( local_size_x = 64 ) in;
+
+struct BoundBox
+{
+  vec4 boxMin;
+  vec4 boxMax;
+};
+
+layout(push_constant) uniform Params
+{
+    mat4 projView;
+    uint instNumber;
+    BoundBox box;
+} params;
+
+layout(std430, binding = 0) buffer MatricesTransform
+{
+    mat4 matricesTransform[];
+};
+
+layout(std430, binding = 1) buffer VisibleObjNum
+{
+    uint visibleObjNum;
+};
+
+layout(std430, binding = 2) buffer VisibleObjIds
+{
+    uint visibleObjIds[];
+};
+
+bool isVisible(mat4 mat, BoundBox box)
+{
+    vec4 boxVertices[8] = {
+        {box.boxMin.x,  box.boxMin.y,  box.boxMin.z,  1.f},
+        {box.boxMax.x,  box.boxMin.y,  box.boxMin.z,  1.f},
+        {box.boxMin.x,  box.boxMax.y,  box.boxMin.z,  1.f},
+        {box.boxMax.x,  box.boxMax.y,  box.boxMin.z,  1.f},
+
+        {box.boxMin.x,  box.boxMin.y,  box.boxMax.z,  1.f},
+        {box.boxMax.x,  box.boxMin.y,  box.boxMax.z,  1.f},
+        {box.boxMin.x,  box.boxMax.y,  box.boxMax.z,  1.f},
+        {box.boxMax.x,  box.boxMax.y,  box.boxMax.z,  1.f},
+    };
+
+    for (uint i = 0; i < 8; i++)
+    {
+        vec4 vertex = mat * boxVertices[i];
+
+        bool isNowVisible = (-vertex.w <= vertex.x) && (vertex.x <= vertex.w) &&
+                         (-vertex.w <= vertex.y) && (vertex.y <= vertex.w) &&
+                         (0.f <= vertex.z) && (vertex.z <= vertex.w);
+
+        if (isNowVisible)
+            return true;
+    }
+    return false;
+}
+
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+
+    if (idx < params.instNumber)
+    {
+        mat4 mat = params.projView * matricesTransform[idx];
+
+        if (isVisible(mat, params.box))
+        {
+            uint i = atomicAdd(visibleObjNum, 1);
+            visibleObjIds[i] = idx;
+        }
+    }
+}

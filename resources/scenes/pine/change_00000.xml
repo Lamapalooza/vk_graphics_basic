@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<textures_lib>
+  <texture id="0" name="Map#0" loc="data/chunk_00000.image4ub" offset="8" bytesize="16" width="2" height="2" dl="0" />
+  <texture id="1" name="D:\scenes\casual-effects\pine\Piney.jpg" path="D:\scenes\casual-effects\pine\Piney.jpg" loc="data/chunk_00001.image4ub" offset="8" bytesize="612800" width="383" height="400" dl="0" />
+  <texture id="2" name="D:\scenes\casual-effects\pine\LushPine.png" path="D:\scenes\casual-effects\pine\LushPine.png" loc="data/chunk_00002.image4ub" offset="8" bytesize="1048576" width="512" height="512" dl="0" />
+</textures_lib>
+<materials_lib>
+  <material id="0" name="hydra_placeholder_material" type="hydra_material">
+    <diffuse brdf_type="lambert">
+      <color>0.078 0.0 0.156</color>
+    </diffuse>
+  </material>
+  <material id="1" name="grayOverrideMat" type="hydra_material">
+    <diffuse brdf_type="lambert">
+      <color val="0.5 0.5 0.5" />
+    </diffuse>
+  </material>
+  <material id="2" name="SoftPineBark" type="hydra_material">
+    <emission>
+      <color val="0 0 0" />
+      <cast_gi val="1" />
+      <multiplier val="1" />
+    </emission>
+    <diffuse brdf_type="lambert">
+      <color val="1 1 1">
+        <texture id="1" type="texref" matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" addressing_mode_u="wrap" addressing_mode_v="wrap" input_gamma="2.20000005" input_alpha="rgb" />
+      </color>
+      <roughness val="0" />
+    </diffuse>
+    <reflectivity brdf_type="phong">
+      <extrusion val="maxcolor" />
+      <color val="0 0 0" />
+      <glossiness val="0.100000001" />
+      <fresnel val="1" />
+      <fresnel_ior val="1.5" />
+    </reflectivity>
+  </material>
+  <material id="3" name="SoftPine2" type="hydra_material">
+    <diffuse brdf_type="lambert">
+      <color val="1 1 1">
+        <texture id="2" type="texref" matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" addressing_mode_u="wrap" addressing_mode_v="wrap" input_gamma="2.19997811" input_alpha="alpha" />
+      </color>
+      <roughness val="0" />
+    </diffuse>
+    <reflectivity brdf_type="ggx">
+      <extrusion val="maxcolor" />
+      <color val="0 0 0" />
+      <glossiness val="1" />
+      <energy_fix val="1" />
+      <fresnel val="1" />
+      <fresnel_ior val="1.5" />
+      <anisotropy val="0" rot="0" flip_axis="1" />
+    </reflectivity>
+    <transparency brdf_type="phong">
+      <color val="0 0 0" />
+      <glossiness val="1" />
+      <thin_walled val="0" />
+      <fog_color val="1 1 1" />
+      <fog_multiplier val="0" />
+      <ior val="1.5" />
+    </transparency>
+    <opacity smooth="0">
+      <texture id="2" type="texref" matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" addressing_mode_u="wrap" addressing_mode_v="wrap" input_gamma="2.19997811" input_alpha="alpha" />
+    </opacity>
+    <emission>
+      <color val="0 0 0" />
+      <cast_gi val="1" />
+    </emission>
+    <translucency>
+      <color val="0 0 0" />
+      <multiplier val="0" />
+    </translucency>
+  </material>
+  <material id="4" name="environment_material" type="hydra_material" light_id="0" visible="1">
+    <emission>
+      <color val="0.419608 0.505882 0.564706" />
+    </emission>
+  </material>
+  <material id="5" name="Direct001_material" type="hydra_material" light_id="1" visible="1">
+    <emission>
+      <color val="3.14159 2.48863 1.9096" />
+    </emission>
+  </material>
+</materials_lib>
+<geometry_lib>
+  <mesh id="0" name="SoftNeedlePine512" type="vsgf" bytesize="73808" loc="data/chunk_00003.vsgf" offset="0" vertNum="1203" triNum="401" dl="0" path="" bbox="-9.5119 8.6645 0.0770534 23.7222 -10.9692 6.85072">
+    <positions type="array4f" bytesize="19248" offset="24" apply="vertex" />
+    <normals type="array4f" bytesize="19248" offset="19272" apply="vertex" />
+    <tangents type="array4f" bytesize="19248" offset="38520" apply="vertex" />
+    <texcoords type="array2f" bytesize="9624" offset="57768" apply="vertex" />
+    <indices type="array1i" bytesize="4812" offset="67392" apply="tlist" />
+    <matindices type="array1i" bytesize="1604" offset="72204" apply="primitive" />
+  </mesh>
+  <mesh id="1" name="SoftNeedlePine256" type="vsgf" bytesize="23208" loc="data/chunk_00004.vsgf" offset="0" vertNum="378" triNum="126" dl="0" path="" bbox="-9.5119 8.6645 0.0770534 23.6242 -10.9692 6.85072">
+    <positions type="array4f" bytesize="6048" offset="24" apply="vertex" />
+    <normals type="array4f" bytesize="6048" offset="6072" apply="vertex" />
+    <tangents type="array4f" bytesize="6048" offset="12120" apply="vertex" />
+    <texcoords type="array2f" bytesize="3024" offset="18168" apply="vertex" />
+    <indices type="array1i" bytesize="1512" offset="21192" apply="tlist" />
+    <matindices type="array1i" bytesize="504" offset="22704" apply="primitive" />
+  </mesh>
+</geometry_lib>
+<lights_lib>
+  <light id="0" name="environment" type="sky" shape="point" distribution="uniform" visible="1" mat_id="4">
+    <intensity>
+      <color val="0.419608 0.505882 0.564706" />
+      <multiplier val="1" />
+    </intensity>
+  </light>
+  <light id="1" name="Direct001" type="directional" shape="point" distribution="directional" visible="1" mat_id="5">
+    <intensity>
+      <color val="1 0.792157 0.607843" />
+      <multiplier val="3.14159274" />
+    </intensity>
+    <shadow_softness val="1" />
+    <angle_radius val="0" />
+    <size inner_radius="2.28600001" outer_radius="3.04799986" />
+  </light>
+</lights_lib>
+<cam_lib>
+  <camera id="0" name="Camera001" type="uvn">
+    <fov>45</fov>
+    <nearClipPlane>0.00999999978</nearClipPlane>
+    <farClipPlane>100</farClipPlane>
+    <enable_dof>0</enable_dof>
+    <dof_lens_radius>0.00999999978</dof_lens_radius>
+    <up>0.034793 0.991482 0.125508</up>
+    <position>-5.77018 8.34536 -20.5944</position>
+    <look_at>1.56386 4.73907 5.86144</look_at>
+    <tiltRotX>0</tiltRotX>
+    <tiltRotY>0</tiltRotY>
+    <tiltShiftX>0</tiltShiftX>
+    <tiltShiftY>0</tiltShiftY>
+  </camera>
+</cam_lib>
+<render_lib />
+<scenes>
+  <scene id="0" name="my scene" discard="1" bbox="-4.382 3.99162 0.0354975 10.9285 -5.05336 3.15603">
+    <instance id="0" mesh_id="0" rmap_id="-1" scn_id="0" scn_sid="0" matrix="0.460686 0 0 0 0 0.460686 0 0 0 0 0.460686 0 0 0 0 1 " />
+    <instance id="1" mesh_id="1" rmap_id="-1" scn_id="0" scn_sid="0" matrix="0.460686 0 0 0 0 0.460686 0 0 0 0 0.460686 0 0 0 0 1 " />
+    <instance_light id="0" light_id="0" matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 " lgroup_id="-1" />
+    <instance_light id="1" light_id="1" matrix="-0.504082 -0.672351 -0.542075 -9.63551 0 0.627652 -0.778494 11.0571 0.863656 -0.392425 -0.316388 -5.53117 0 0 0 1 " lgroup_id="-1" />
+  </scene>
+</scenes>

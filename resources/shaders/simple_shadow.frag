@@ -21,6 +21,16 @@ layout(binding = 0, set = 0) uniform AppData
 
 layout (binding = 1) uniform sampler2D shadowMap;
 
+layout(binding = 2, set = 0) readonly buffer MatricesTransform
+{
+    mat4 matricesTransform[];
+};
+
+layout(binding = 3, set = 0) readonly buffer VisibleObjIds
+{
+    uint visibleObjIds[];
+};
+
 void main()
 {
   const vec4 posLightClipSpace = Params.lightMatrix*vec4(surf.wPos, 1.0f); // 
