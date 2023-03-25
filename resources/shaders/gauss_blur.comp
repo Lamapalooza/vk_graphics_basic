@@ -1,0 +1,128 @@
+#version 430
+
+layout(local_size_x = 32, local_size_y = 32) in;
+
+const uint windowRad = 7;
+const uint windowSize = windowRad * 2 + 1;
+
+layout (rgba32f, binding = 0) uniform readonly  image2D rawImg;
+layout (rgba32f, binding = 1) uniform writeonly image2D blurredImg;
+
+shared vec3[32 + windowSize - 1][32 + windowSize - 1] imgPart;
+
+layout (binding = 2) uniform GaussianKernel
+{
+  vec4 coeffs[windowSize/4+1];
+} gaussianKernel;
+
+float getGaussCoeff(uint i)
+{
+  return gaussianKernel.coeffs[i/4][uint(mod(i, 4))];
+}
+
+void prepareImgPart(uvec2 globalId, uvec2 localId, uvec2 rawImgSize, uvec2 groupImgSize)
+{
+    imgPart[localId.y + windowRad][localId.x + windowRad] = imageLoad(rawImg, ivec2(globalId)).rgb;
+
+    if (localId.x < windowRad)                                             
+    {
+        if (globalId.x < windowRad)
+            imgPart[localId.y + windowRad][localId.x] = vec3(0.f);
+        else
+            imgPart[localId.y + windowRad][localId.x] = imageLoad(rawImg, ivec2(globalId.x - windowRad, globalId.y)).rgb;
+    }
+
+    if (localId.x + windowRad >= groupImgSize.x)                                  
+    {
+        if (globalId.x + windowRad >= rawImgSize.x)
+            imgPart[localId.y + windowRad][localId.x + 2 * windowRad] = vec3(0.f);
+        else
+            imgPart[localId.y + windowRad][localId.x + 2 * windowRad] = imageLoad(rawImg, ivec2(globalId.x + windowRad, globalId.y)).rgb;
+    }
+
+    if (localId.y < windowRad)                                             
+    {
+        if (globalId.y < windowRad)
+            imgPart[localId.y][localId.x + windowRad] = vec3(0.f);
+        else
+            imgPart[localId.y][localId.x + windowRad] = imageLoad(rawImg, ivec2(globalId.x, globalId.y - windowRad)).rgb;
+    }
+
+    if (localId.y + windowRad >= groupImgSize.y)                                  
+    {
+        if (globalId.y + windowRad >= rawImgSize.y)
+            imgPart[localId.y + 2 * windowRad][localId.x + windowRad] = vec3(0.f);
+        else
+            imgPart[localId.y + 2 * windowRad][localId.x + windowRad] = imageLoad(rawImg, ivec2(globalId.x, globalId.y + windowRad)).rgb;
+    }
+
+    if (localId.x < windowRad && localId.y < windowRad)                           
+    {
+        if (globalId.x < windowRad || globalId.y < windowRad)
+            imgPart[localId.y][localId.x] = vec3(0.f);
+        else
+            imgPart[localId.y][localId.x] = imageLoad(rawImg, ivec2(globalId.x - windowRad, globalId.y - windowRad)).rgb;
+    }
+
+    if (localId.x < windowRad && localId.y + windowRad >= groupImgSize.y)                
+    {
+        if (globalId.x < windowRad || globalId.y + windowRad >= rawImgSize.y)
+            imgPart[localId.y + 2 * windowRad][localId.x] = vec3(0.f);
+        else
+            imgPart[localId.y + 2 * windowRad][localId.x] = imageLoad(rawImg, ivec2(globalId.x - windowRad, globalId.y + windowRad)).rgb;
+    }
+
+    if (localId.x + windowRad >= groupImgSize.x && localId.y < windowRad)                
+    {
+        if (globalId.x >= rawImgSize.x - windowRad || globalId.y < windowRad)
+            imgPart[localId.y][localId.x + 2 * windowRad] = vec3(0.f);
+        else
+            imgPart[localId.y][localId.x + 2 * windowRad] = imageLoad(rawImg, ivec2(globalId.x + windowRad, globalId.y - windowRad)).rgb;
+    }
+
+    if (localId.x + windowRad >= groupImgSize.x && localId.y + windowRad >= groupImgSize.y)     
+    {
+        if (globalId.x + windowRad >= rawImgSize.x || globalId.y + windowRad >= rawImgSize.y)
+            imgPart[localId.y + 2 * windowRad][localId.x + 2 * windowRad] = vec3(0.f);
+        else
+            imgPart[localId.y + 2 * windowRad][localId.x + 2 * windowRad] = imageLoad(rawImg, ivec2(globalId.x + windowRad, globalId.y + windowRad)).rgb;
+    }
+}
+
+void main() 
+{
+    uvec2 globalId = gl_GlobalInvocationID.xy;
+    uvec2 rawImgSize = imageSize(rawImg);
+
+    if (globalId.x < rawImgSize.x && globalId.y < rawImgSize.y)
+    {
+        uvec2 localId = gl_LocalInvocationID.xy;
+        uvec2 groupImgSize = gl_WorkGroupSize.xy;
+
+        prepareImgPart(globalId, localId, rawImgSize, groupImgSize);
+        barrier();
+        
+        vec3 gaussColor = vec3(0.f);
+        float norm = 0.f;
+        for(int i = 0; i < windowSize; ++i)
+        {
+            gaussColor += getGaussCoeff(i) * imgPart[localId.y + i][localId.x + windowRad];
+            norm += getGaussCoeff(i);
+        }
+        gaussColor /= norm;
+        barrier();
+
+        imgPart[localId.y + windowRad][localId.x + windowRad] = gaussColor;
+        barrier();
+
+        gaussColor = vec3(0.f);
+        for(int i = 0; i < windowSize; ++i)
+            gaussColor += getGaussCoeff(i) * imgPart[localId.y + windowRad][localId.x + i];
+        gaussColor /= norm;
+        barrier();
+        imgPart[localId.y + windowRad][localId.x + windowRad] = gaussColor;
+        barrier();
+        imageStore(blurredImg, ivec2(globalId), vec4(imgPart[localId.y + windowRad][localId.x + windowRad], 1.0));
+        barrier();
+     }
+}

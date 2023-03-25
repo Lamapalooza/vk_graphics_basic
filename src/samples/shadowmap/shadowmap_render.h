@@ -47,8 +47,11 @@ private:
   etna::GlobalContext* m_context;
   etna::Image mainViewDepth;
   etna::Image shadowMap;
+  etna::Image rawImg;
+  etna::Image blurredImg;
   etna::Sampler defaultSampler;
   etna::Buffer constants;
+  etna::Buffer gaussianCoeffs;
 
   VkCommandPool    m_commandPool    = VK_NULL_HANDLE;
 
@@ -77,6 +80,7 @@ private:
 
   etna::GraphicsPipeline m_basicForwardPipeline {};
   etna::GraphicsPipeline m_shadowPipeline {};
+  etna::ComputePipeline m_gaussBlurPipeline{};
 
   std::shared_ptr<vk_utils::DescriptorMaker> m_pBindings = nullptr;
   
@@ -87,6 +91,7 @@ private:
   uint32_t m_width  = 1024u;
   uint32_t m_height = 1024u;
   uint32_t m_framesInFlight = 2u;
+  uint32_t m_blurWindowSize = 15;
   bool m_vsync = false;
 
   vk::PhysicalDeviceFeatures m_enabledDeviceFeatures = {};
