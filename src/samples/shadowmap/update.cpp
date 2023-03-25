@@ -22,6 +22,9 @@ void SimpleShadowmapRender::UpdateView()
   auto mWorldViewProj = mProjFix * mProj * mLookAt;
   
   m_worldViewProj = mWorldViewProj;
+
+  transformsInv.projInv = LiteMath::inverse4x4(mProjFix * mProj);
+  transformsInv.viewInv = LiteMath::inverse4x4(mLookAt);
   
   ///// calc light matrix
   //
@@ -44,6 +47,7 @@ void SimpleShadowmapRender::UpdateUniformBuffer(float a_time)
   m_uniforms.lightMatrix = m_lightMatrix;
   m_uniforms.lightPos    = m_light.cam.pos; //LiteMath::float3(sinf(a_time), 1.0f, cosf(a_time));
   m_uniforms.time        = a_time;
+  m_uniforms.baseColor   = LiteMath::float3(0.95f, 0.95f, 0.95f);
 
   memcpy(m_uboMappedMem, &m_uniforms, sizeof(m_uniforms));
 }

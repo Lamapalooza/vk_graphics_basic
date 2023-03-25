@@ -3,17 +3,22 @@
 #extension GL_GOOGLE_include_directive : require
 
 #include "unpack_attributes.h"
-
+#include "common.h"
 
 layout(location = 0) in vec4 vPosNorm;
 layout(location = 1) in vec4 vTexCoordAndTang;
+
+layout(binding = 0, set = 0) uniform AppData
+{
+  UniformParams Params;
+};
 
 layout(push_constant) uniform params_t
 {
     mat4 mProjView;
     mat4 mModel;
+    uint id_albedo;
 } params;
-
 
 layout (location = 0 ) out VS_OUT
 {

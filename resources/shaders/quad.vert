@@ -4,8 +4,8 @@
 layout(push_constant) uniform params_t
 {
   vec4 scaleAndOffs;
-  vec4 depthMinMaxScale;
-
+  mat4 mProjInverse;
+  mat4 mViewInverse;
 } params;
 
 layout (location = 0 ) out VS_OUT

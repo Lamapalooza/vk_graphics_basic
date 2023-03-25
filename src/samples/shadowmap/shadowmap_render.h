@@ -46,7 +46,7 @@ public:
 private:
   etna::GlobalContext* m_context;
   etna::Image mainViewDepth;
-  etna::Image shadowMap;
+  etna::Image shadowMap, normalMap, albedoMap;
   etna::Sampler defaultSampler;
   etna::Buffer constants;
 
@@ -67,7 +67,15 @@ private:
   {
     float4x4 projView;
     float4x4 model;
+    uint id_albedo;
   } pushConst2M;
+
+  struct
+  {
+    float4 scaleAndOffs;
+    float4x4 projInv;
+    float4x4 viewInv;
+  } transformsInv;
 
   float4x4 m_worldViewProj;
   float4x4 m_lightMatrix;    
@@ -77,6 +85,7 @@ private:
 
   etna::GraphicsPipeline m_basicForwardPipeline {};
   etna::GraphicsPipeline m_shadowPipeline {};
+  etna::GraphicsPipeline m_deferredPipeline{};
 
   std::shared_ptr<vk_utils::DescriptorMaker> m_pBindings = nullptr;
   
@@ -96,9 +105,9 @@ private:
   std::shared_ptr<SceneManager>     m_pScnMgr;
   std::shared_ptr<IRenderGUI> m_pGUIRender;
   
-  std::shared_ptr<vk_utils::IQuad>               m_pFSQuad;
-  VkDescriptorSet       m_quadDS; 
-  VkDescriptorSetLayout m_quadDSLayout = nullptr;
+  std::shared_ptr<vk_utils::IQuad> m_pFSQuadDepth, m_pFSQuadNormal;
+  VkDescriptorSet m_quadDSDepth, m_quadDSNormal;
+  VkDescriptorSetLayout m_quadDSLayoutDepth = nullptr, m_quadDSLayoutNormal = nullptr;
 
   struct InputControlMouseEtc
   {
